@@ -43,26 +43,26 @@ void addTask(const char *task)
     strcpy(tasks[length].task, task); // strcpy(into, from)
     // updates the length of the tasks array
     length++;
-    printf("Task added");
+    printf("Task added.\n");
 }
 
 // no arguments required
 void listTasks()
 {
-    char status;
+    const char *status;
 
     for (int i = 0; i < length; i++)
     {
         if (tasks[i].completed == 1)
         {
-            status = 'D';
+            status = "done.\n";
         }
         else
         {
-            status = 'N';
+            status = "not done.\n";
         }
 
-        printf("%d. %s is %c\n", i, tasks[i].task, status);
+        printf("%d. %s is %s\n", i, tasks[i].task, status);
     }
 }
 
@@ -71,11 +71,11 @@ void markCompleted(int index)
     if (index <= length && index > 0)
     {
         tasks[index - 1].completed = 1;
-        printf("Task is now completed.");
+        printf("Task is now completed.\n");
     }
     else
     {
-        printf("Invalid index.");
+        printf("Invalid index.\n");
     }
 }
 
@@ -96,7 +96,7 @@ void deleteTask(int index)
     }
     else
     {
-        printf("Invalid index.");
+        printf("Invalid index.\n");
     }
 }
 
@@ -112,16 +112,16 @@ void editTask(int index, const char *task)
         {
             tasks[index].task = editedTask;
             strcpy(tasks[index].task, task);
-            printf("Task updated successfully.");
+            printf("Task updated successfully.\n");
         }
         else
         {
-            printf("Memory allocation failed.");
+            printf("Memory allocation failed.\n");
         }
     }
     else
     {
-        printf("Invalid index.");
+        printf("Invalid index.\n");
     }
 }
 
@@ -142,14 +142,21 @@ int main()
 
     while (programIsRunning)
     {
+        printf("Please enter a task to perform: ");
         scanf("%d", &userInput);
 
         switch (userInput)
         {
         case 1:
             printf("Enter task: ");
+            // gets rid of a new line if there is one from scanf
             getchar();
+            // used to read a line of text until a new line from the standard input (stdin)
+            // taskInput is an array of characters that the fgets method reads
+            // sizeof ensures the fgets doesn't read more than it is supposed to
             fgets(taskInput, sizeof(taskInput), stdin);
+            // this removes the newline char from the userinput
+            // strcpsn finds the position of the newline char and replaces it with a null terminator
             taskInput[strcspn(taskInput, "\n")] = '\0';
             addTask(taskInput);
 
@@ -177,7 +184,7 @@ int main()
             break;
         case 5:
             printf("Enter index: ");
-            scanf("%d", indexInput);
+            scanf("%d", &indexInput);
             deleteTask(indexInput);
 
             break;
