@@ -7,7 +7,7 @@ typedef struct
     // char* task vs. char task:
     // would only allocate space for a single char instead of a full string (using char task[100] is limiting)
     // typically used for strings in C because they are arrays of characters and an array is basically a pointer to its first element
-    char* task;
+    char *task;
     int completed; // 1 = true, 0 = false
 } Task;
 
@@ -18,13 +18,13 @@ typedef struct
 // Task tasks would declare a single Task struct, not an array of tasks
 
 // mainly using these as pointers because we can dynamically allocate memory when we don't know how much we will need later
-Task* tasks = NULL;
+Task *tasks = NULL;
 int length = 0;
 
 // refers to the input string task you need to add in the TODO list
 // is a pointer to a character because don't know how long it will be
 // is a const so that the data pointed to by the string cannot be modified within the function
-void addTask(const char* task)
+void addTask(const char *task)
 {
     // dynamically resize the tasks array to hold one more Task struct
     // casting to (Task *) lets the compiler know the memory is an array of Task struct
@@ -46,29 +46,151 @@ void addTask(const char* task)
     printf("Task added");
 }
 
-void listTasks() 
+// no arguments required
+void listTasks()
 {
+    char status;
 
+    for (int i = 0; i < length; i++)
+    {
+        if (tasks[i].completed == 1)
+        {
+            status = 'D';
+        }
+        else
+        {
+            status = 'N';
+        }
+
+        printf("%d. %s is %c\n", i, tasks[i].task, status);
+    }
 }
 
-void deleteTask() 
+void markCompleted(int index)
 {
-
+    if (index <= length && index > 0)
+    {
+        tasks[index - 1].completed = 1;
+        printf("Task is now completed.");
+    }
+    else
+    {
+        printf("Invalid index.");
+    }
 }
 
-void markCompleted() 
+void deleteTask(int index)
 {
+    if (index <= length && index > 0)
+    {
+        index--;
+        free(tasks[index].task);
 
+        for (int i = index; i < length - 1; i++)
+        {
+            tasks[i] = tasks[i + 1];
+        }
+
+        length--;
+        tasks = (Task *)realloc(tasks, (length * sizeof(Task)));
+    }
+    else
+    {
+        printf("Invalid index.");
+    }
 }
 
-void editTask() 
+void editTask(int index, const char *task)
 {
+    if (index <= length && index > 0)
+    {
+        index--;
 
+        char *editedTask = (char *)realloc(tasks[index].task, strlen(task) + 1);
+
+        if (editedTask != NULL)
+        {
+            tasks[index].task = editedTask;
+            strcpy(tasks[index].task, task);
+            printf("Task updated successfully.");
+        }
+        else
+        {
+            printf("Memory allocation failed.");
+        }
+    }
+    else
+    {
+        printf("Invalid index.");
+    }
 }
 
 int main()
 {
-    printf("Hello Todo!\n");
+    printf("\nOptions\n");
+    printf("1. Add task\n");
+    printf("2. List all tasks\n");
+    printf("3. Mark a task as completed\n");
+    printf("4. Edit task\n");
+    printf("5. Delete task\n");
+    printf("6. Exit\n");
+
+    int userInput;
+    int programIsRunning = 1;
+    char taskInput[100];
+    int indexInput;
+
+    while (programIsRunning)
+    {
+        scanf("%d", &userInput);
+
+        switch (userInput)
+        {
+        case 1:
+            printf("Enter task: ");
+            getchar();
+            fgets(taskInput, sizeof(taskInput), stdin);
+            taskInput[strcspn(taskInput, "\n")] = '\0';
+            addTask(taskInput);
+
+            break;
+        case 2:
+            listTasks();
+
+            break;
+        case 3:
+            printf("Enter index: ");
+            scanf("%d", &indexInput);
+            markCompleted(indexInput);
+
+            break;
+        case 4:
+            printf("Enter index: ");
+            scanf("%d", &indexInput);
+            printf("Enter edited task: ");
+            getchar();
+            fgets(taskInput, sizeof(taskInput), stdin);
+            taskInput[strcspn(taskInput, "\n")] = '\0';
+
+            editTask(indexInput, taskInput);
+
+            break;
+        case 5:
+            printf("Enter index: ");
+            scanf("%d", indexInput);
+            deleteTask(indexInput);
+
+            break;
+        case 6:
+            programIsRunning = 0;
+
+            break;
+        default:
+            printf("Invalid choice.");
+        }
+    }
+
+    free(tasks);
 
     return 0;
 }
